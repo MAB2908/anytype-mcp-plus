@@ -11,7 +11,7 @@ export const propertyTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
         ...paginationSchema,
       },
       required: ['space_id'],
@@ -23,8 +23,8 @@ export const propertyTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        property_id: { type: 'string', description: 'ID de la propiedad', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        property_id: { type: 'string', description: 'ID de la propiedad' },
       },
       required: ['space_id', 'property_id'],
     },
@@ -35,10 +35,10 @@ export const propertyTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
         key: { type: 'string', description: 'Clave única de la propiedad' },
-        name: { type: 'string', description: 'Nombre de la propiedad', required: true },
-        type: { type: 'string', description: 'Tipo de propiedad', required: true },
+        name: { type: 'string', description: 'Nombre de la propiedad' },
+        type: { type: 'string', description: 'Tipo de propiedad' },
         description: { type: 'string', description: 'Descripción' },
         format: { type: 'string', description: 'Formato específico' },
         source_object: { type: 'string', description: 'ID del objeto fuente' },
@@ -53,8 +53,8 @@ export const propertyTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        property_id: { type: 'string', description: 'ID de la propiedad', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        property_id: { type: 'string', description: 'ID de la propiedad' },
         name: { type: 'string', description: 'Nuevo nombre' },
         description: { type: 'string', description: 'Nueva descripción' },
         format: { type: 'string', description: 'Nuevo formato' },
@@ -70,8 +70,8 @@ export const propertyTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        property_id: { type: 'string', description: 'ID de la propiedad', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        property_id: { type: 'string', description: 'ID de la propiedad' },
       },
       required: ['space_id', 'property_id'],
     },

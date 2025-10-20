@@ -11,7 +11,7 @@ export const typeTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
       },
       required: ['space_id'],
     },
@@ -22,8 +22,8 @@ export const typeTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        type_id: { type: 'string', description: 'ID del tipo', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        type_id: { type: 'string', description: 'ID del tipo' },
       },
       required: ['space_id', 'type_id'],
     },
@@ -34,9 +34,9 @@ export const typeTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
         key: { type: 'string', description: 'Clave única del tipo' },
-        name: { type: 'string', description: 'Nombre del tipo', required: true },
+        name: { type: 'string', description: 'Nombre del tipo' },
         plural_name: { type: 'string', description: 'Nombre plural del tipo (se auto-genera si no se proporciona)' },
         description: { type: 'string', description: 'Descripción del tipo' },
         icon: iconSchema,
@@ -52,8 +52,8 @@ export const typeTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        type_id: { type: 'string', description: 'ID del tipo', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        type_id: { type: 'string', description: 'ID del tipo' },
         name: { type: 'string', description: 'Nuevo nombre' },
         description: { type: 'string', description: 'Nueva descripción' },
         icon: iconSchema,
@@ -69,8 +69,8 @@ export const typeTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        type_id: { type: 'string', description: 'ID del tipo', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        type_id: { type: 'string', description: 'ID del tipo' },
       },
       required: ['space_id', 'type_id'],
     },

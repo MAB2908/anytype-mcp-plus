@@ -73,21 +73,3 @@ export const objectPropertiesSchema = {
     additionalProperties: false,
   },
 };
-
-// Base schema for required space_id
-export const spaceIdSchema = {
-  space_id: { 
-    type: 'string', 
-    description: 'ID del espacio', 
-    required: true 
-  },
-};
-
-// Base schema for required object_id
-export const objectIdSchema = {
-  object_id: { 
-    type: 'string', 
-    description: 'ID del objeto', 
-    required: true 
-  },
-};

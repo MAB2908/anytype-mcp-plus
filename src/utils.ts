@@ -46,13 +46,17 @@ export function buildNewObjectData(updateData: any, currentObject: any, contentF
     newObjectData.icon = updateData.icon || currentObject.object.icon;
   }
 
-  // Only add properties if they exist and filter system properties
+  // Handle properties with improved tag support
   if (updateData.properties) {
+    // Use new properties from updateData (already processed by validateAndProcessTags)
     newObjectData.properties = updateData.properties;
+    console.log(`Using updated properties: ${updateData.properties.length} properties`);
   } else if (currentObject.object.properties) {
+    // Use existing properties, filtered to remove system properties
     const filteredProperties = filterSystemProperties(currentObject.object.properties);
     if (filteredProperties.length > 0) {
       newObjectData.properties = filteredProperties;
+      console.log(`Using existing properties: ${filteredProperties.length} properties`);
     }
   }
 

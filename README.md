@@ -196,6 +196,42 @@ docker-compose up --build  # Build and run with Docker
 - **🔒 Strict**: Better dependency resolution
 - **🌐 Monorepo Ready**: Built-in workspace support
 
+## 🏷️ Tags Management
+
+### Enhanced Tag Support
+
+The MCP now includes **enhanced tag management** with automatic validation and processing:
+
+- ✅ **Automatic Tag Validation**: Tags are validated when creating/updating objects
+- ✅ **Improved Error Handling**: Clear error messages for invalid tag assignments
+- ✅ **Better Documentation**: Comprehensive examples and usage patterns
+- ✅ **Consistent API**: Standardized property_id usage across all tag operations
+
+### Quick Tag Workflow
+
+1. **Create tags** for a multi_select property:
+   ```bash
+   anytype_create_tag --space_id="space123" --name="Urgent" --color="red" --property_id="prop456"
+   ```
+
+2. **Create object** with tags:
+   ```bash
+   anytype_create_object \
+     --space_id="space123" \
+     --name="My Task" \
+     --properties='[{"key":"labels","multi_select":["tag_id_1","tag_id_2"]}]'
+   ```
+
+3. **Update object** with new tags:
+   ```bash
+   anytype_update_object \
+     --space_id="space123" \
+     --object_id="obj789" \
+     --properties='[{"key":"status","select":"completed_tag_id"}]'
+   ```
+
+For complete tag usage examples, see [TAGS_USAGE.md](./TAGS_USAGE.md).
+
 ## 🔄 Special Object Update Method
 
 ### Important: Object Recreation Pattern

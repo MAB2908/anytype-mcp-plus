@@ -11,8 +11,8 @@ export const tagTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        property_key: { type: 'string', description: 'Property key', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        property_key: { type: 'string', description: 'Property key' },
         ...paginationSchema,
       },
       required: ['space_id', 'property_key'],
@@ -24,8 +24,8 @@ export const tagTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        tag_id: { type: 'string', description: 'Tag ID', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        tag_id: { type: 'string', description: 'Tag ID' },
       },
       required: ['space_id', 'tag_id'],
     },
@@ -36,14 +36,14 @@ export const tagTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        name: { type: 'string', description: 'Tag name', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        name: { type: 'string', description: 'Tag name' },
         color: { 
           type: 'string', 
           description: 'Tag color',
           enum: ['grey', 'yellow', 'orange', 'red', 'pink', 'purple', 'blue', 'ice', 'teal', 'lime']
         },
-        property_id: { type: 'string', description: 'Property ID (for multi_select properties)', required: true },
+        property_id: { type: 'string', description: 'Property ID (for multi_select properties)' },
       },
       required: ['space_id', 'name', 'property_id'],
     },
@@ -54,8 +54,8 @@ export const tagTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        tag_id: { type: 'string', description: 'Tag ID', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        tag_id: { type: 'string', description: 'Tag ID' },
         name: { type: 'string', description: 'New name' },
         color: { 
           type: 'string', 
@@ -72,8 +72,8 @@ export const tagTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        tag_id: { type: 'string', description: 'Tag ID', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        tag_id: { type: 'string', description: 'Tag ID' },
       },
       required: ['space_id', 'tag_id'],
     },

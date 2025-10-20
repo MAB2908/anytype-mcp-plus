@@ -24,7 +24,7 @@ export const objectTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
         ...paginationSchema,
       },
       required: ['space_id'],
@@ -36,8 +36,8 @@ export const objectTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        object_id: { type: 'string', description: 'ID del objeto', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        object_id: { type: 'string', description: 'ID del objeto' },
       },
       required: ['space_id', 'object_id'],
     },
@@ -48,8 +48,8 @@ export const objectTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        name: { type: 'string', description: 'Nombre del objeto', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        name: { type: 'string', description: 'Nombre del objeto' },
         type_key: { type: 'string', description: 'Tipo de objeto', default: 'page' },
         body: { type: 'string', description: 'Contenido del objeto (Markdown)' },
         markdown: { type: 'string', description: 'Contenido del objeto (Markdown) - alias para body' },
@@ -66,8 +66,8 @@ export const objectTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        object_id: { type: 'string', description: 'ID del objeto', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        object_id: { type: 'string', description: 'ID del objeto' },
         name: { type: 'string', description: 'Nuevo nombre del objeto' },
         body: { type: 'string', description: 'Nuevo contenido (Markdown) - Se aplicará estrategia de reemplazo' },
         markdown: { type: 'string', description: 'Nuevo contenido (Markdown) - alias para body - Se aplicará estrategia de reemplazo' },
@@ -83,8 +83,8 @@ export const objectTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        object_id: { type: 'string', description: 'ID del objeto', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        object_id: { type: 'string', description: 'ID del objeto' },
       },
       required: ['space_id', 'object_id'],
     },

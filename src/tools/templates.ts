@@ -11,8 +11,8 @@ export const templateTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        type_id: { type: 'string', description: 'Type ID (required - templates are associated with types)', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        type_id: { type: 'string', description: 'Type ID (required - templates are associated with types)' },
         ...paginationSchema,
       },
       required: ['space_id', 'type_id'],
@@ -24,9 +24,9 @@ export const templateTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        type_id: { type: 'string', description: 'Type ID (required - templates are associated with types)', required: true },
-        template_id: { type: 'string', description: 'Template ID', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        type_id: { type: 'string', description: 'Type ID (required - templates are associated with types)' },
+        template_id: { type: 'string', description: 'Template ID' },
       },
       required: ['space_id', 'type_id', 'template_id'],
     },
@@ -37,9 +37,9 @@ export const templateTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        collection_id: { type: 'string', description: 'Collection ID', required: true },
-        object_id: { type: 'string', description: 'Object ID', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        collection_id: { type: 'string', description: 'Collection ID' },
+        object_id: { type: 'string', description: 'Object ID' },
       },
       required: ['space_id', 'collection_id', 'object_id'],
     },
@@ -50,38 +50,11 @@ export const templateTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        collection_id: { type: 'string', description: 'Collection ID', required: true },
-        object_id: { type: 'string', description: 'Object ID', required: true },
+        space_id: { type: 'string', description: 'Space ID' },
+        collection_id: { type: 'string', description: 'Collection ID' },
+        object_id: { type: 'string', description: 'Object ID' },
       },
       required: ['space_id', 'collection_id', 'object_id'],
-    },
-  },
-  {
-    name: 'anytype_get_list_views',
-    description: 'Gets available views for a list',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        list_id: { type: 'string', description: 'List ID', required: true },
-      },
-      required: ['space_id', 'list_id'],
-    },
-  },
-  {
-    name: 'anytype_get_list_objects',
-    description: 'Gets objects from a list using a specific view',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        space_id: { type: 'string', description: 'Space ID', required: true },
-        list_id: { type: 'string', description: 'List ID', required: true },
-        view_id: { type: 'string', description: 'View ID', required: true },
-        limit: { type: 'number', description: 'Results limit' },
-        offset: { type: 'number', description: 'Pagination offset' },
-      },
-      required: ['space_id', 'list_id', 'view_id'],
     },
   },
 ];

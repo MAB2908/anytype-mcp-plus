@@ -3,8 +3,6 @@
  * Las listas en Anytype reemplazan el concepto de colecciones
  */
 
-import { paginationSchema } from './schemas.js';
-
 export const listTools = [
   {
     name: 'anytype_get_list_views',
@@ -12,8 +10,8 @@ export const listTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        list_id: { type: 'string', description: 'ID de la lista', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        list_id: { type: 'string', description: 'ID de la lista' },
       },
       required: ['space_id', 'list_id'],
     },
@@ -24,9 +22,9 @@ export const listTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        list_id: { type: 'string', description: 'ID de la lista', required: true },
-        view_id: { type: 'string', description: 'ID de la vista', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        list_id: { type: 'string', description: 'ID de la lista' },
+        view_id: { type: 'string', description: 'ID de la vista' },
         limit: { type: 'number', description: 'Límite de resultados' },
         offset: { type: 'number', description: 'Offset para paginación' },
       },

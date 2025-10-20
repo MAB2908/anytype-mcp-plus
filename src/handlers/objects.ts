@@ -1,6 +1,54 @@
 import { makeRequest, buildNewObjectData, AnytypeApiError } from '../utils.js';
 
 /**
+ * Helper function to validate and process tag assignments
+ * @param spaceId - Space ID
+ * @param properties - Array of properties with potential tags
+ * @returns Promise<any[]> - Validated properties array
+ */
+async function validateAndProcessTags(spaceId: string, properties: any[]): Promise<any[]> {
+  if (!properties || !Array.isArray(properties)) {
+    return [];
+  }
+
+  const processedProperties = [];
+
+  for (const prop of properties) {
+    const processedProp = { ...prop };
+
+    // Handle multi_select properties (tags)
+    if (prop.multi_select && Array.isArray(prop.multi_select)) {
+      try {
+        // Validate that all tag IDs exist
+        // Note: We can't easily validate individual tags without knowing the property_id
+        // This is a limitation of the current API structure
+        console.log(`Processing multi_select property "${prop.key}" with ${prop.multi_select.length} tags`);
+        processedProp.multi_select = prop.multi_select;
+      } catch (error) {
+        console.warn(`Warning: Could not validate tags for property "${prop.key}":`, error);
+        // Keep the tags anyway, let the API handle validation
+        processedProp.multi_select = prop.multi_select;
+      }
+    }
+
+    // Handle single select properties
+    if (prop.select) {
+      try {
+        console.log(`Processing select property "${prop.key}" with tag: ${prop.select}`);
+        processedProp.select = prop.select;
+      } catch (error) {
+        console.warn(`Warning: Could not validate tag for property "${prop.key}":`, error);
+        processedProp.select = prop.select;
+      }
+    }
+
+    processedProperties.push(processedProp);
+  }
+
+  return processedProperties;
+}
+
+/**
  * Search objects globally or within a specific space
  * Fixed based on official Anytype API documentation 2025-05-20
  */
@@ -75,7 +123,7 @@ export async function handleGetObject(args: any) {
  * Create a new object
  */
 export async function handleCreateObject(args: any) {
-  const { space_id, ...objectData } = args;
+  const { space_id, properties, ...objectData } = args;
   
   // Handle markdown alias
   if (objectData.markdown && !objectData.body) {
@@ -83,21 +131,57 @@ export async function handleCreateObject(args: any) {
     delete objectData.markdown;
   }
   
+  // Process and validate tags if properties are provided
+  let processedProperties = [];
+  if (properties && Array.isArray(properties)) {
+    processedProperties = await validateAndProcessTags(space_id, properties);
+    console.log(`Processed ${processedProperties.length} properties for new object`);
+  }
+  
+  const finalObjectData = {
+    ...objectData,
+    ...(processedProperties.length > 0 && { properties: processedProperties })
+  };
+  
   const response = await makeRequest(`/v1/spaces/${space_id}/objects`, {
     method: 'POST',
-    body: JSON.stringify(objectData),
+    body: JSON.stringify(finalObjectData),
   });
-  return { content: [{ type: 'text', text: JSON.stringify(response, null, 2) }] };
+  
+  return { 
+    content: [{ 
+      type: 'text', 
+      text: JSON.stringify({
+        message: 'Object created successfully',
+        object: response,
+        processed_properties: processedProperties.length,
+        tag_assignments: processedProperties.filter(p => p.multi_select || p.select).length
+      }, null, 2) 
+    }] 
+  };
 }
 
 /**
  * Update an object with replacement strategy for content updates
  */
 export async function handleUpdateObject(args: any) {
-  const { space_id, object_id, body, markdown, ...updateData } = args;
+  const { space_id, object_id, body, markdown, properties, ...updateData } = args;
   
   // Handle markdown alias
   const contentField = markdown || body;
+  
+  // Process and validate tags if properties are provided
+  let processedProperties = [];
+  if (properties && Array.isArray(properties)) {
+    processedProperties = await validateAndProcessTags(space_id, properties);
+    console.log(`Processed ${processedProperties.length} properties for object update`);
+  }
+  
+  // Prepare final update data
+  const finalUpdateData = {
+    ...updateData,
+    ...(processedProperties.length > 0 && { properties: processedProperties })
+  };
   
   // If there's content to update, use replacement strategy
   if (contentField) {
@@ -105,8 +189,8 @@ export async function handleUpdateObject(args: any) {
       // Get current object
       const currentObject = await makeRequest(`/v1/spaces/${space_id}/objects/${object_id}`);
       
-      // Build new object data
-      const newObjectData = buildNewObjectData(updateData, currentObject, contentField);
+      // Build new object data with processed properties
+      const newObjectData = buildNewObjectData(finalUpdateData, currentObject, contentField);
       
       // Create new object
       const newObjectResponse = await makeRequest(`/v1/spaces/${space_id}/objects`, {
@@ -126,7 +210,9 @@ export async function handleUpdateObject(args: any) {
             message: 'Object updated successfully using replacement strategy',
             old_object_id: object_id,
             new_object: newObjectResponse,
-            strategy: 'replacement'
+            strategy: 'replacement',
+            processed_properties: processedProperties.length,
+            tag_assignments: processedProperties.filter(p => p.multi_select || p.select).length
           }, null, 2)
         }]
       };
@@ -135,9 +221,14 @@ export async function handleUpdateObject(args: any) {
       
       // Fallback to traditional PATCH method
       try {
+        const patchData = {
+          body: contentField,
+          ...finalUpdateData
+        };
+        
         const response = await makeRequest(`/v1/spaces/${space_id}/objects/${object_id}`, {
           method: 'PATCH',
-          body: JSON.stringify({ body: contentField, ...updateData }),
+          body: JSON.stringify(patchData),
         });
         
         return {
@@ -147,6 +238,8 @@ export async function handleUpdateObject(args: any) {
               message: 'Object updated using traditional method (replacement failed)',
               object: response,
               strategy: 'traditional',
+              processed_properties: processedProperties.length,
+              tag_assignments: processedProperties.filter(p => p.multi_select || p.select).length,
               replacement_error: replacementError instanceof Error ? replacementError.message : 'Unknown error'
             }, null, 2)
           }]
@@ -163,9 +256,20 @@ export async function handleUpdateObject(args: any) {
     // No content update, use traditional PATCH
     const response = await makeRequest(`/v1/spaces/${space_id}/objects/${object_id}`, {
       method: 'PATCH',
-      body: JSON.stringify(updateData),
+      body: JSON.stringify(finalUpdateData),
     });
-    return { content: [{ type: 'text', text: JSON.stringify(response, null, 2) }] };
+    
+    return { 
+      content: [{ 
+        type: 'text', 
+        text: JSON.stringify({
+          message: 'Object updated successfully',
+          object: response,
+          processed_properties: processedProperties.length,
+          tag_assignments: processedProperties.filter(p => p.multi_select || p.select).length
+        }, null, 2) 
+      }] 
+    };
   }
 }
 

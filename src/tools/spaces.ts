@@ -16,7 +16,7 @@ export const spaceTools = [
     inputSchema: {
       type: 'object',
       properties: { 
-        space_id: { type: 'string', description: 'ID del espacio', required: true } 
+        space_id: { type: 'string', description: 'ID del espacio' } 
       },
       required: ['space_id'],
     },
@@ -27,7 +27,7 @@ export const spaceTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        name: { type: 'string', description: 'Nombre del espacio', required: true },
+        name: { type: 'string', description: 'Nombre del espacio' },
         description: { type: 'string', description: 'Descripción del espacio' },
         icon: iconSchema,
       },
@@ -40,7 +40,7 @@ export const spaceTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
         name: { type: 'string', description: 'Nuevo nombre del espacio' },
         description: { type: 'string', description: 'Nueva descripción del espacio' },
         icon: iconSchema,
@@ -54,7 +54,7 @@ export const spaceTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
         ...paginationSchema,
       },
       required: ['space_id'],
@@ -66,8 +66,8 @@ export const spaceTools = [
     inputSchema: {
       type: 'object',
       properties: {
-        space_id: { type: 'string', description: 'ID del espacio', required: true },
-        member_id: { type: 'string', description: 'ID del miembro', required: true },
+        space_id: { type: 'string', description: 'ID del espacio' },
+        member_id: { type: 'string', description: 'ID del miembro' },
       },
       required: ['space_id', 'member_id'],
     },

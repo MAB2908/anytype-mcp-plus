@@ -212,7 +212,7 @@ async function main() {
   
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('🎯 Servidor MCP conectado y listo para recibir solicitudes');
+  console.error('Servidor MCP conectado y listo para recibir solicitudes');
 }
 
 await main();
