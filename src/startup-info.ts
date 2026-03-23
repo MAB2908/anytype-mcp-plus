@@ -28,7 +28,7 @@ function getPackageInfo(): PackageInfo {
 }
 
 function getAnytypePort(): string {
-  return process.env.ANYTYPE_API_URL?.replace('http://localhost:', '') || '31009';
+  return process.env.ANYTYPE_BASE_URL?.replace('http://localhost:', '') || '31009';
 }
 
 function getMCPPort(): string {

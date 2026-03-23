@@ -1,5 +1,36 @@
 #!/usr/bin/env node
 
+/**
+ * anytype-mcp-plus — Enhanced MCP Server for Anytype
+ *
+ * A Model Context Protocol (MCP) server that provides 34 tools for interacting
+ * with the Anytype REST API. Enables AI assistants (Claude, etc.) to create,
+ * read, update, and delete Anytype objects, types, properties, tags, templates,
+ * and collections.
+ *
+ * ARCHITECTURE:
+ * - Entry point: this file (index.ts) — registers all tools and routes calls
+ * - Tool schemas: src/tools/ — input validation and descriptions
+ * - Handlers:    src/handlers/ — API call logic
+ * - Utilities:   src/utils.ts — HTTP client, data transformers
+ *
+ * SOURCES & ATTRIBUTION:
+ * This project is a fork of cryptonahue/mcp-anytype (MIT License).
+ * Research and reference implementation from anyproto/anytype-mcp (MIT License).
+ * API specification: anyproto/anytype-api (Anytype REST API v2025-11-08).
+ *
+ * ENVIRONMENT VARIABLES:
+ * - ANYTYPE_API_KEY (required): Bearer token from Anytype desktop app
+ *   Settings → API → Create API Key
+ * - ANYTYPE_API_URL or ANYTYPE_BASE_URL (optional): API base URL
+ *   Default: http://localhost:31009
+ *   Both names accepted for backward compatibility.
+ *
+ * @version 1.1.0
+ * @license MIT
+ * @see https://github.com/MAB2908/anytype-mcp-plus
+ */
+
 import 'dotenv/config';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -32,6 +63,7 @@ import {
 
 import {
   handleSearchObjects,
+  handleGlobalSearch,
   handleListObjects,
   handleGetObject,
   handleCreateObject,
@@ -71,8 +103,8 @@ console.error('API Key:', process.env.ANYTYPE_API_KEY ? 'Present' : 'Missing');
 // Create the server
 const server = new Server(
   {
-    name: 'anytype-mcp-server',
-    version: '0.1.0',
+    name: 'anytype-mcp-plus',
+    version: '1.1.0',
   },
   {
     capabilities: {
@@ -121,6 +153,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       // Objects
       case 'anytype_search_objects':
         return await handleSearchObjects(args);
+      case 'anytype_global_search':
+        return await handleGlobalSearch(args);
       case 'anytype_list_objects':
         return await handleListObjects(args);
       case 'anytype_get_object':
@@ -174,13 +208,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'anytype_get_template':
         return await handleGetTemplate(args);
 
-      // Lists (reemplazan las colecciones)
+      // Lists (replace collections)
       case 'anytype_get_list_views':
         return await handleGetListViews(args);
       case 'anytype_get_list_objects':
         return await handleGetListObjects(args);
 
-      // Colecciones (DEPRECATED - usar listas en su lugar)
+      // Collections (DEPRECATED - use lists instead)
       case 'anytype_add_to_collection':
         return await handleAddToCollection(args);
       case 'anytype_remove_from_collection':
@@ -212,7 +246,7 @@ async function main() {
   
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('Servidor MCP conectado y listo para recibir solicitudes');
+  console.error('MCP server connected and ready to receive requests');
 }
 
 await main();

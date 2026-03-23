@@ -31,30 +31,4 @@ export const templateTools = [
       required: ['space_id', 'type_id', 'template_id'],
     },
   },
-  {
-    name: 'anytype_add_to_collection',
-    description: 'Adds an object to a collection',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        space_id: { type: 'string', description: 'Space ID' },
-        collection_id: { type: 'string', description: 'Collection ID' },
-        object_id: { type: 'string', description: 'Object ID' },
-      },
-      required: ['space_id', 'collection_id', 'object_id'],
-    },
-  },
-  {
-    name: 'anytype_remove_from_collection',
-    description: 'Removes an object from a collection',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        space_id: { type: 'string', description: 'Space ID' },
-        collection_id: { type: 'string', description: 'Collection ID' },
-        object_id: { type: 'string', description: 'Object ID' },
-      },
-      required: ['space_id', 'collection_id', 'object_id'],
-    },
-  },
 ];

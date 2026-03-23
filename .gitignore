@@ -143,3 +143,5 @@ investigate_*.js
 # MCP specific
 .mcp/
 mcp-logs/
+# Claude Code local settings
+.claude/

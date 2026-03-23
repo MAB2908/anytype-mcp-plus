@@ -25,9 +25,10 @@ export const tagTools = [
       type: 'object',
       properties: {
         space_id: { type: 'string', description: 'Space ID' },
+        property_id: { type: 'string', description: 'Property ID for the tag property' },
         tag_id: { type: 'string', description: 'Tag ID' },
       },
-      required: ['space_id', 'tag_id'],
+      required: ['space_id', 'property_id', 'tag_id'],
     },
   },
   {
@@ -55,15 +56,16 @@ export const tagTools = [
       type: 'object',
       properties: {
         space_id: { type: 'string', description: 'Space ID' },
+        property_id: { type: 'string', description: 'Property ID for the tag property' },
         tag_id: { type: 'string', description: 'Tag ID' },
         name: { type: 'string', description: 'New name' },
-        color: { 
-          type: 'string', 
+        color: {
+          type: 'string',
           description: 'New color',
           enum: ['grey', 'yellow', 'orange', 'red', 'pink', 'purple', 'blue', 'ice', 'teal', 'lime']
         },
       },
-      required: ['space_id', 'tag_id'],
+      required: ['space_id', 'property_id', 'tag_id'],
     },
   },
   {
@@ -73,9 +75,10 @@ export const tagTools = [
       type: 'object',
       properties: {
         space_id: { type: 'string', description: 'Space ID' },
+        property_id: { type: 'string', description: 'Property ID for the tag property' },
         tag_id: { type: 'string', description: 'Tag ID' },
       },
-      required: ['space_id', 'tag_id'],
+      required: ['space_id', 'property_id', 'tag_id'],
     },
   },
 ];

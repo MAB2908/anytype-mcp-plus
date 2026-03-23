@@ -1,0 +1,33 @@
+# Source files (only dist/ is published)
+src/
+tsconfig.json
+*.ts
+!dist/
+
+# Development
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Test and reports
+reports/
+*.test.*
+*.spec.*
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup copies (local development artifacts)

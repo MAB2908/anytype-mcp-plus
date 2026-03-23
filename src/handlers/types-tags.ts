@@ -50,7 +50,7 @@ export async function handleCreateType(args: any) {
     plural_name: finalPluralName, // Required field (not documented but mandatory)
     description,
     icon,
-    key: key || `${name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`, // Generate unique key if not provided
+    key: key || name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''), // Generate slug from name if not provided
     layout: layout || 'basic', // Default to basic layout (required field)
     properties: properties || [], // Array of property IDs
     ...typeData
@@ -65,13 +65,74 @@ export async function handleCreateType(args: any) {
 
 /**
  * Update a type
+ * Based on official API documentation: PATCH /v1/spaces/{space_id}/types/{type_id}
+ *
+ * API LIMITATION: UpdateTypeRequest.properties expects array of PropertyLink objects
+ * with required fields {format, key, name}, not just IDs.
+ * Fix: if properties array of IDs is provided, resolve each ID to a PropertyLink via GET.
+ *
+ * API LIMITATION: Adding properties to an existing type via PATCH is supported since
+ * API version 2025-11-08 but requires the full PropertyLink structure.
  */
 export async function handleUpdateType(args: any) {
-  const { space_id, type_id, ...updateData } = args;
+  const { space_id, type_id, name, properties, icon, layout, plural_name, description, ...rest } = args;
+
+  // Build request body with only provided fields
+  const requestBody: any = {};
+  if (name !== undefined) requestBody.name = name;
+  if (icon !== undefined) requestBody.icon = icon;
+  if (layout !== undefined) requestBody.layout = layout;
+  if (plural_name !== undefined) requestBody.plural_name = plural_name;
+  if (description !== undefined) requestBody.description = description;
+
+  // Handle properties: API requires PropertyLink objects {format, key, name}, not just IDs.
+  // If caller passed an array of ID strings, resolve each to a PropertyLink via GET.
+  if (properties && Array.isArray(properties) && properties.length > 0) {
+    try {
+      const propertyLinks = await Promise.all(
+        properties.map(async (propIdOrObj: any) => {
+          // If already a PropertyLink object with required fields, use as-is
+          if (typeof propIdOrObj === 'object' && propIdOrObj.key && propIdOrObj.name && propIdOrObj.format) {
+            return propIdOrObj;
+          }
+          // Otherwise treat as property ID and fetch full data
+          const propId = typeof propIdOrObj === 'string' ? propIdOrObj : propIdOrObj.id;
+          const propResponse = await makeRequest(`/v1/spaces/${space_id}/properties/${propId}`);
+          const p = propResponse?.property;
+          if (!p) {
+            throw new Error(`Property "${propId}" not found in space "${space_id}"`);
+          }
+          // Return PropertyLink with all required fields
+          return {
+            key: p.key,
+            name: p.name,
+            format: p.format
+          };
+        })
+      );
+      requestBody.properties = propertyLinks;
+    } catch (resolveError: any) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            error: 'Failed to resolve property IDs to PropertyLink objects',
+            message: resolveError?.message || String(resolveError),
+            hint: 'Provide valid property IDs that exist in this space. ' +
+                  'Use list_properties to find available property IDs.',
+            api_requirement: 'Anytype API UpdateTypeRequest.properties requires ' +
+                             'PropertyLink objects with {format, key, name} fields.'
+          }, null, 2)
+        }]
+      };
+    }
+  }
+
   const response = await makeRequest(`/v1/spaces/${space_id}/types/${type_id}`, {
     method: 'PATCH',
-    body: JSON.stringify(updateData),
+    body: JSON.stringify(requestBody),
   });
+
   return { content: [{ type: 'text', text: JSON.stringify(response, null, 2) }] };
 }
 
@@ -88,29 +149,86 @@ export async function handleDeleteType(args: any) {
 
 // Tags
 /**
- * List tags for a property
- * Fixed based on official API documentation - using property_id in URL path
+ * Lists tags for a property.
+ *
+ * IMPORTANT: The Anytype API URL path requires a property ID (bafyrei... hash),
+ * NOT the string key. This handler auto-resolves string keys to IDs:
+ * - If property_key looks like a bafyrei... hash → used directly as property_id
+ * - If property_key is a string key (e.g. "tag") → resolved via list_properties
+ *
+ * This resolution was necessary because the parameter naming in the MCP schema
+ * ("property_key") was misleading — the API actually needs the property ID.
+ * Discovered during testing: passing "tag" caused Tool execution failed.
+ *
+ * API endpoint: GET /v1/spaces/{space_id}/properties/{property_id}/tags
+ *
+ * @param args.space_id - Space containing the property
+ * @param args.property_key - Property ID (bafyrei...) or string key to resolve
+ * @param args.property_id - Alternative parameter name for property_key
+ * @param args.limit - Results limit (default: 20)
+ * @param args.offset - Pagination offset (default: 0)
  */
 export async function handleListTags(args: any) {
   const { space_id, property_key, property_id, limit = 20, offset = 0 } = args;
-  
-  // Use property_id if provided, otherwise fall back to property_key for backwards compatibility
-  const propertyIdentifier = property_id || property_key;
-  
-  if (!propertyIdentifier) {
-    return { 
-      content: [{ 
-        type: 'text', 
+
+  // Support both property_key (legacy) and property_id parameter names
+  let rawIdentifier = property_id || property_key;
+
+  if (!rawIdentifier) {
+    return {
+      content: [{
+        type: 'text',
         text: JSON.stringify({
           error: 'Missing required parameter',
-          message: 'Field "property_id" is required for listing tags',
+          message: 'Field "property_key" is required for listing tags. ' +
+                   'Provide the property ID (bafyrei... format) or the property key string (e.g. "tag").',
           provided_parameters: Object.keys(args)
-        }, null, 2) 
-      }] 
+        }, null, 2)
+      }]
     };
   }
-  
-  const response = await makeRequest(`/v1/spaces/${space_id}/properties/${propertyIdentifier}/tags?limit=${limit}&offset=${offset}`);
+
+  // If a string key was provided instead of a bafyrei... ID, resolve it
+  let propertyId = rawIdentifier;
+  if (!rawIdentifier.startsWith('bafyrei')) {
+    try {
+      const propsResponse = await makeRequest(`/v1/spaces/${space_id}/properties?limit=100`);
+      const props = propsResponse?.data || [];
+      const found = props.find((p: any) => p.key === rawIdentifier || p.name === rawIdentifier);
+      if (!found) {
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              error: `Property with key or name "${rawIdentifier}" not found`,
+              message: 'Anytype API requires the property ID (bafyrei... format) in the URL path, ' +
+                       'not the string key. Auto-resolution failed because no property matched.',
+              hint: 'Use list_properties to find the correct property ID for your tag property.',
+              api_note: 'Endpoint: GET /v1/spaces/{space_id}/properties/{property_id}/tags — ' +
+                        'property_id is a bafyrei... hash, not a string key.'
+            }, null, 2)
+          }]
+        };
+      }
+      propertyId = found.id;
+    } catch (e: any) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            error: 'Failed to resolve property key to ID',
+            message: e?.message || String(e),
+            hint: 'Provide the property ID directly (bafyrei... format from list_properties).'
+          }, null, 2)
+        }]
+      };
+    }
+  }
+
+  const response = await makeRequest(
+    `/v1/spaces/${space_id}/properties/${propertyId}/tags?limit=${limit}&offset=${offset}`
+  );
+
   return { content: [{ type: 'text', text: JSON.stringify(response, null, 2) }] };
 }
 

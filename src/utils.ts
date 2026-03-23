@@ -2,8 +2,11 @@ import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import fetch from 'node-fetch';
 
 // API configuration
-export const API_BASE_URL = process.env.ANYTYPE_API_URL || 'http://localhost:31009';
-export const API_VERSION = '2025-05-20';
+// Support both env var names for backward compatibility
+// ANYTYPE_API_URL: legacy name from original cryptonahue/mcp-anytype
+// ANYTYPE_BASE_URL: name used in Claude Desktop config examples
+export const API_BASE_URL = process.env.ANYTYPE_API_URL || process.env.ANYTYPE_BASE_URL || 'http://localhost:31009';
+export const API_VERSION = '2025-11-08';
 
 // System properties that cannot be set directly via API
 export const SYSTEM_PROPERTIES = ['backlinks', 'links', 'last_modified_date', 'last_modified_by', 'created_date', 'creator', 'last_opened_date'];
@@ -50,13 +53,22 @@ export function buildNewObjectData(updateData: any, currentObject: any, contentF
   if (updateData.properties) {
     // Use new properties from updateData (already processed by validateAndProcessTags)
     newObjectData.properties = updateData.properties;
-    console.log(`Using updated properties: ${updateData.properties.length} properties`);
+    console.error(`Using updated properties: ${updateData.properties.length} properties`);
   } else if (currentObject.object.properties) {
     // Use existing properties, filtered to remove system properties
     const filteredProperties = filterSystemProperties(currentObject.object.properties);
     if (filteredProperties.length > 0) {
-      newObjectData.properties = filteredProperties;
-      console.log(`Using existing properties: ${filteredProperties.length} properties`);
+      // Normalize multi_select tags: API expects array of string IDs, not objects
+      newObjectData.properties = filteredProperties.map((prop: any) => {
+        if (prop.multi_select && Array.isArray(prop.multi_select)) {
+          return {
+            ...prop,
+            multi_select: prop.multi_select.map((t: any) => typeof t === 'string' ? t : (t.id || t))
+          };
+        }
+        return prop;
+      });
+      console.error(`Using existing properties: ${filteredProperties.length} properties`);
     }
   }
 
@@ -64,10 +76,16 @@ export function buildNewObjectData(updateData: any, currentObject: any, contentF
 }
 
 /**
- * Helper function for API requests
- * @param endpoint - API endpoint
- * @param options - Request options
- * @returns API response
+ * Makes an HTTP request to the Anytype REST API.
+ *
+ * Automatically includes the required Authorization header (Bearer token from
+ * ANYTYPE_API_KEY env var) and the Anytype-Version header.
+ *
+ * @param endpoint - API path starting with /v1/ (e.g. /v1/spaces)
+ * @param options - Optional fetch options (method, body, headers).
+ *   Defaults to GET with no body.
+ * @returns Parsed JSON response from the API.
+ * @throws {McpError} If the HTTP response is not OK (4xx/5xx).
  */
 export async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
   const apiKey = process.env.ANYTYPE_API_KEY;
