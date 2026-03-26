@@ -1,6 +1,6 @@
 {
   "name": "anytype-mcp-plus",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "description": "Enhanced MCP server for Anytype — 34 tools for full CRUD on spaces, objects, types, properties, tags, templates, collections, and global search. Fork of cryptonahue/mcp-anytype with bug fixes and new capabilities.",
   "author": "MAB2908",
